@@ -22,6 +22,8 @@ class SimMaterialData;
 class SimElectronData;
 class SimPhotonData;
 
+class SimSBTables;
+
 class Track;
 
 //
@@ -70,6 +72,10 @@ void   KeepTrackingPhoton(SimPhotonData& phData, SimMaterialData& matData, Geom&
 // computed.
 void   RotateToLabFrame(double &u, double &v, double &w, double u1, double u2, double u3);
 void   RotateToLabFrame(double* dir, double* refdir);
+
+// Auxiliary funtion for bremsstrahlung final state generation.
+//
+void   PerformBrem(Track& track, SimSBTables* theSBTable);
 
 // Auxiliary funtion for simple e+e- annihilation
 void   PerformAnnihilation(Track& track);

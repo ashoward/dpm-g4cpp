@@ -40,7 +40,6 @@
 void   Simulate(int nprimary, double eprimary, bool iselectron, double lbox, SimMaterialData& matData, SimElectronData& elData, SimPhotonData& phData, int geomIndex) {
   const double kPI            = 3.1415926535897932;
   const double kEMC2          = 0.510991;
-  const double kHalfSqrt2EMC2 = kEMC2 * 0.7071067812;
   //
   // create the simple geometry
   Geom geom(lbox, &matData, geomIndex);
@@ -174,38 +173,9 @@ void   Simulate(int nprimary, double eprimary, bool iselectron, double lbox, Sim
               // (1) discrete bremsstrahlung interaction should be sampled:
               //     - sample energy transfer to the photon (if any)
               case 1 : {
-                         const double gcut = theGammaCut;
-                         double theGammaEnergy = 0.0;
-
-                         if ( track.fEkin > gcut) {
-                            theGammaEnergy = elData.GetTheSBTables()->SampleEnergyTransfer(track.fEkin, theVoxelMatIndx,
-                                                                                    Random::UniformRand(),
-                                                                                    Random::UniformRand(),
-                                                                                    Random::UniformRand());
-                           // insert the secondary gamma track into the stack
-                           Track& aTrack        = TrackStack::Instance().Insert();
-                           aTrack.fType         = 0;
-                           aTrack.fEkin         = theGammaEnergy;
-                           aTrack.fMatIndx      = track.fMatIndx;
-                           aTrack.fPosition[0]  = track.fPosition[0];
-                           aTrack.fPosition[1]  = track.fPosition[1];
-                           aTrack.fPosition[2]  = track.fPosition[2];
-                           aTrack.fBoxIndx[0]   = track.fBoxIndx[0];
-                           aTrack.fBoxIndx[1]   = track.fBoxIndx[1];
-                           aTrack.fBoxIndx[2]   = track.fBoxIndx[2];
-                           //
-                           // compute emission direction (rough approximation in DPM by the mean)
-                           // and no deflection of the primary e-
-                           const double dum0    = kHalfSqrt2EMC2/(track.fEkin+kEMC2);
-                           const double cost    = std::max(-1.0, std::min(1.0, 1.0-dum0*dum0));
-                           const double sint    = std::sqrt((1.0+cost)*(1.0-cost));
-                           const double phi     = 2.0*kPI*Random::UniformRand();
-                           aTrack.fDirection[0] = sint*std::cos(phi);
-                           aTrack.fDirection[1] = sint*std::sin(phi);
-                           aTrack.fDirection[2] = cost;
-                           RotateToLabFrame(aTrack.fDirection, track.fDirection);
-                           // decrease the primary energy:
-                           track.fEkin = track.fEkin-theGammaEnergy;
+                         // perform bremsstrahlung
+                         if (track.fEkin > theGammaCut) {
+                           PerformBrem(track, elData.GetTheSBTables());
                          }
                          // check if the post-interaction electron energy dropped
                          // below the tracking cut and stop tracking if yes
@@ -727,6 +697,44 @@ void RotateToLabFrame(double &u, double &v, double &w, double u1, double u2, dou
 
 void RotateToLabFrame(double* dir, double* refdir) {
   RotateToLabFrame(dir[0], dir[1], dir[2], refdir[0], refdir[1], refdir[2]);
+}
+
+
+// it is assumed that track.fEkin > gamma-cut
+void PerformBrem(Track& track, SimSBTables* theSBTable) {
+  const double kPI            = 3.1415926535897932;
+  const double kEMC2          = 0.510991;
+  const double kHalfSqrt2EMC2 = kEMC2 * 0.7071067812;
+  // sample energy transferred to the emitted gamma photon
+  const double eGamma = theSBTable->SampleEnergyTransfer(track.fEkin,
+                                                         track.fMatIndx,
+                                                         Random::UniformRand(),
+                                                         Random::UniformRand(),
+                                                        Random::UniformRand());
+ // insert the secondary gamma track into the stack
+ Track& aTrack        = TrackStack::Instance().Insert();
+ aTrack.fType         = 0;
+ aTrack.fEkin         = eGamma;
+ aTrack.fMatIndx      = track.fMatIndx;
+ aTrack.fPosition[0]  = track.fPosition[0];
+ aTrack.fPosition[1]  = track.fPosition[1];
+ aTrack.fPosition[2]  = track.fPosition[2];
+ aTrack.fBoxIndx[0]   = track.fBoxIndx[0];
+ aTrack.fBoxIndx[1]   = track.fBoxIndx[1];
+ aTrack.fBoxIndx[2]   = track.fBoxIndx[2];
+ //
+ // compute emission direction (rough approximation in DPM by the mean)
+ // and no deflection of the primary e-
+ const double dum0    = kHalfSqrt2EMC2/(track.fEkin+kEMC2);
+ const double cost    = std::max(-1.0, std::min(1.0, 1.0-dum0*dum0));
+ const double sint    = std::sqrt((1.0+cost)*(1.0-cost));
+ const double phi     = 2.0*kPI*Random::UniformRand();
+ aTrack.fDirection[0] = sint*std::cos(phi);
+ aTrack.fDirection[1] = sint*std::sin(phi);
+ aTrack.fDirection[2] = cost;
+ RotateToLabFrame(aTrack.fDirection, track.fDirection);
+ // decrease the primary energy:
+ track.fEkin = track.fEkin-eGamma;
 }
 
 
