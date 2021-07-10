@@ -39,7 +39,6 @@
 
 void   Simulate(int nprimary, double eprimary, bool iselectron, double lbox, SimMaterialData& matData, SimElectronData& elData, SimPhotonData& phData, int geomIndex) {
   const double kPI            = 3.1415926535897932;
-  const double kEMC2          = 0.510991;
   //
   // create the simple geometry
   Geom geom(lbox, &matData, geomIndex);
@@ -173,7 +172,7 @@ void   Simulate(int nprimary, double eprimary, bool iselectron, double lbox, Sim
               // (1) discrete bremsstrahlung interaction should be sampled:
               //     - sample energy transfer to the photon (if any)
               case 1 : {
-                         // perform bremsstrahlung
+                         // perform bremsstrahlung interaction but only if E0 > gcut
                          if (track.fEkin > theGammaCut) {
                            PerformBrem(track, elData.GetTheSBTables());
                          }
@@ -205,37 +204,10 @@ void   Simulate(int nprimary, double eprimary, bool iselectron, double lbox, Sim
               //       the interaction
               //       Furthermore, note that Moller interaction is independent from Z
               case 2 : {
-                          // energy transfer is sampled in E0 units and E0 must be at least 2cut
-                          const double kcut = theElectronCut/track.fEkin;
-                          double secEkin = 0.0;
-                          double secCost = 1.0;
-                          if (kcut<0.5) {
-                            const double k2EMC2 = 2.0*kEMC2;
-                            secEkin = elData.GetTheMollerTables()->SampleEnergyTransfer(track.fEkin, Random::UniformRand(), Random::UniformRand(), Random::UniformRand());
-                            secCost = std::min(1.0, std::sqrt(secEkin*(track.fEkin+k2EMC2)/(track.fEkin*(secEkin+k2EMC2))));
+                          // perform ionisation (Moller) intraction but only if E0 > 2cut
+                          if (track.fEkin > 2.*theElectronCut) {
+                            PerformMoller(track, elData.GetTheMollerTables());
                           }
-                          // if interaction was possible. i.e. both seconday and post-intecation primary ekin > ecut
-                          if (secEkin>0.0) {
-                            // insert the secondary e- track into the stack
-                            Track& aTrack        = TrackStack::Instance().Insert();
-                            aTrack.fType         = -1;
-                            aTrack.fEkin         = secEkin;
-                            aTrack.fMatIndx      = track.fMatIndx;
-                            aTrack.fPosition[0]  = track.fPosition[0];
-                            aTrack.fPosition[1]  = track.fPosition[1];
-                            aTrack.fPosition[2]  = track.fPosition[2];
-                            aTrack.fBoxIndx[0]   = track.fBoxIndx[0];
-                            aTrack.fBoxIndx[1]   = track.fBoxIndx[1];
-                            aTrack.fBoxIndx[2]   = track.fBoxIndx[2];
-                            const double sint    = std::sqrt((1.0+secCost)*(1.0-secCost));
-                            const double phi     = 2.0*kPI*Random::UniformRand();
-                            aTrack.fDirection[0] = sint*std::cos(phi);
-                            aTrack.fDirection[1] = sint*std::sin(phi);
-                            aTrack.fDirection[2] = secCost;
-                            RotateToLabFrame(aTrack.fDirection, track.fDirection);
-                            // decrease primary energy: DMP do not deflect the primary
-                            track.fEkin -= secEkin;
-                         }
                          // Resample #mfp left and interpolate the IMFP since the enrgy has been changed.
                          // Again, the reference material Moller IMFP value is used
                          numMollerMFP = -std::log(Random::UniformRand());
@@ -700,7 +672,8 @@ void RotateToLabFrame(double* dir, double* refdir) {
 }
 
 
-// it is assumed that track.fEkin > gamma-cut
+// It is assumed that track.fEkin > gamma-cut!
+// (Interaction is not possible otherwise)
 void PerformBrem(Track& track, SimSBTables* theSBTable) {
   const double kPI            = 3.1415926535897932;
   const double kEMC2          = 0.510991;
@@ -735,6 +708,39 @@ void PerformBrem(Track& track, SimSBTables* theSBTable) {
  RotateToLabFrame(aTrack.fDirection, track.fDirection);
  // decrease the primary energy:
  track.fEkin = track.fEkin-eGamma;
+}
+
+// It is assumed that track.fEkin > 2*electron-cut!
+// (Interaction is not possible otherwise)
+void PerformMoller(Track& track, SimMollerTables* theMollerTable) {
+  const double kPI     = 3.1415926535897932;
+  const double kEMC2   = 0.510991;
+  const double k2EMC2  = 2.0*kEMC2;
+  const double secEkin = theMollerTable->SampleEnergyTransfer( track.fEkin,
+                                                               Random::UniformRand(),
+                                                               Random::UniformRand(),
+                                                               Random::UniformRand());
+  const double cost    = std::sqrt(secEkin*(track.fEkin+k2EMC2)/(track.fEkin*(secEkin+k2EMC2)));
+  const double secCost = std::min(1.0, cost);
+  // insert the secondary e- track into the stack
+  Track& aTrack        = TrackStack::Instance().Insert();
+  aTrack.fType         = -1;
+  aTrack.fEkin         = secEkin;
+  aTrack.fMatIndx      = track.fMatIndx;
+  aTrack.fPosition[0]  = track.fPosition[0];
+  aTrack.fPosition[1]  = track.fPosition[1];
+  aTrack.fPosition[2]  = track.fPosition[2];
+  aTrack.fBoxIndx[0]   = track.fBoxIndx[0];
+  aTrack.fBoxIndx[1]   = track.fBoxIndx[1];
+  aTrack.fBoxIndx[2]   = track.fBoxIndx[2];
+  const double sint    = std::sqrt((1.0+secCost)*(1.0-secCost));
+  const double phi     = 2.0*kPI*Random::UniformRand();
+  aTrack.fDirection[0] = sint*std::cos(phi);
+  aTrack.fDirection[1] = sint*std::sin(phi);
+  aTrack.fDirection[2] = secCost;
+  RotateToLabFrame(aTrack.fDirection, track.fDirection);
+  // decrease primary energy: DMP do not deflect the primary
+  track.fEkin -= secEkin;
 }
 
 

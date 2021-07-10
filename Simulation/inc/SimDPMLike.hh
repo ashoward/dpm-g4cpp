@@ -23,6 +23,7 @@ class SimElectronData;
 class SimPhotonData;
 
 class SimSBTables;
+class SimMollerTables;
 
 class Track;
 
@@ -74,8 +75,9 @@ void   RotateToLabFrame(double &u, double &v, double &w, double u1, double u2, d
 void   RotateToLabFrame(double* dir, double* refdir);
 
 // Auxiliary funtion for bremsstrahlung final state generation.
-//
 void   PerformBrem(Track& track, SimSBTables* theSBTable);
+// Auxiliary funtion for ionisation (Moller) final state generation.
+void   PerformMoller(Track& track, SimMollerTables* theMollerTable);
 
 // Auxiliary funtion for simple e+e- annihilation
 void   PerformAnnihilation(Track& track);
