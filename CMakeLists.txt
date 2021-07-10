@@ -19,12 +19,12 @@ include ( ${Geant4_USE_FILE} )
 #-------------------------------------------------------------------------------
 # Set the CXX flags and default build type
 #
-#if (NOT EXISTS ${CMAKE_BINARY_DIR}/CMakeCache.txt)
-#  if (NOT CMAKE_BUILD_TYPE)
-#    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
-#  endif()
-#endif()
-#set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
+if (NOT EXISTS ${CMAKE_BINARY_DIR}/CMakeCache.txt)
+  if (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
+  endif()
+endif()
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
 
 
 
