@@ -38,10 +38,6 @@
 
 
 void   Simulate(int nprimary, double eprimary, bool iselectron, double lbox, SimMaterialData& matData, SimElectronData& elData, SimPhotonData& phData, int geomIndex) {
-  const double kPI            = 3.1415926535897932;
-  const double kEMC2          = 0.510991;
-  const double kHalfSqrt2EMC2 = kEMC2 * 0.7071067812;
-  //
   // create the simple geometry
   Geom geom(lbox, &matData, geomIndex);
   //
@@ -174,38 +170,9 @@ void   Simulate(int nprimary, double eprimary, bool iselectron, double lbox, Sim
               // (1) discrete bremsstrahlung interaction should be sampled:
               //     - sample energy transfer to the photon (if any)
               case 1 : {
-                         const double gcut = theGammaCut;
-                         double theGammaEnergy = 0.0;
-
-                         if ( track.fEkin > gcut) {
-                            theGammaEnergy = elData.GetTheSBTables()->SampleEnergyTransfer(track.fEkin, theVoxelMatIndx,
-                                                                                    Random::UniformRand(),
-                                                                                    Random::UniformRand(),
-                                                                                    Random::UniformRand());
-                           // insert the secondary gamma track into the stack
-                           Track& aTrack        = TrackStack::Instance().Insert();
-                           aTrack.fType         = 0;
-                           aTrack.fEkin         = theGammaEnergy;
-                           aTrack.fMatIndx      = track.fMatIndx;
-                           aTrack.fPosition[0]  = track.fPosition[0];
-                           aTrack.fPosition[1]  = track.fPosition[1];
-                           aTrack.fPosition[2]  = track.fPosition[2];
-                           aTrack.fBoxIndx[0]   = track.fBoxIndx[0];
-                           aTrack.fBoxIndx[1]   = track.fBoxIndx[1];
-                           aTrack.fBoxIndx[2]   = track.fBoxIndx[2];
-                           //
-                           // compute emission direction (rough approximation in DPM by the mean)
-                           // and no deflection of the primary e-
-                           const double dum0    = kHalfSqrt2EMC2/(track.fEkin+kEMC2);
-                           const double cost    = std::max(-1.0, std::min(1.0, 1.0-dum0*dum0));
-                           const double sint    = std::sqrt((1.0+cost)*(1.0-cost));
-                           const double phi     = 2.0*kPI*Random::UniformRand();
-                           aTrack.fDirection[0] = sint*std::cos(phi);
-                           aTrack.fDirection[1] = sint*std::sin(phi);
-                           aTrack.fDirection[2] = cost;
-                           RotateToLabFrame(aTrack.fDirection, track.fDirection);
-                           // decrease the primary energy:
-                           track.fEkin = track.fEkin-theGammaEnergy;
+                         // perform bremsstrahlung interaction but only if E0 > gcut
+                         if (track.fEkin > theGammaCut) {
+                           PerformBrem(track, elData.GetTheSBTables());
                          }
                          // check if the post-interaction electron energy dropped
                          // below the tracking cut and stop tracking if yes
@@ -235,37 +202,10 @@ void   Simulate(int nprimary, double eprimary, bool iselectron, double lbox, Sim
               //       the interaction
               //       Furthermore, note that Moller interaction is independent from Z
               case 2 : {
-                          // energy transfer is sampled in E0 units and E0 must be at least 2cut
-                          const double kcut = theElectronCut/track.fEkin;
-                          double secEkin = 0.0;
-                          double secCost = 1.0;
-                          if (kcut<0.5) {
-                            const double k2EMC2 = 2.0*kEMC2;
-                            secEkin = elData.GetTheMollerTables()->SampleEnergyTransfer(track.fEkin, Random::UniformRand(), Random::UniformRand(), Random::UniformRand());
-                            secCost = std::min(1.0, std::sqrt(secEkin*(track.fEkin+k2EMC2)/(track.fEkin*(secEkin+k2EMC2))));
+                          // perform ionisation (Moller) intraction but only if E0 > 2cut
+                          if (track.fEkin > 2.*theElectronCut) {
+                            PerformMoller(track, elData.GetTheMollerTables());
                           }
-                          // if interaction was possible. i.e. both seconday and post-intecation primary ekin > ecut
-                          if (secEkin>0.0) {
-                            // insert the secondary e- track into the stack
-                            Track& aTrack        = TrackStack::Instance().Insert();
-                            aTrack.fType         = -1;
-                            aTrack.fEkin         = secEkin;
-                            aTrack.fMatIndx      = track.fMatIndx;
-                            aTrack.fPosition[0]  = track.fPosition[0];
-                            aTrack.fPosition[1]  = track.fPosition[1];
-                            aTrack.fPosition[2]  = track.fPosition[2];
-                            aTrack.fBoxIndx[0]   = track.fBoxIndx[0];
-                            aTrack.fBoxIndx[1]   = track.fBoxIndx[1];
-                            aTrack.fBoxIndx[2]   = track.fBoxIndx[2];
-                            const double sint    = std::sqrt((1.0+secCost)*(1.0-secCost));
-                            const double phi     = 2.0*kPI*Random::UniformRand();
-                            aTrack.fDirection[0] = sint*std::cos(phi);
-                            aTrack.fDirection[1] = sint*std::sin(phi);
-                            aTrack.fDirection[2] = secCost;
-                            RotateToLabFrame(aTrack.fDirection, track.fDirection);
-                            // decrease primary energy: DMP do not deflect the primary
-                            track.fEkin -= secEkin;
-                         }
                          // Resample #mfp left and interpolate the IMFP since the enrgy has been changed.
                          // Again, the reference material Moller IMFP value is used
                          numMollerMFP = -std::log(Random::UniformRand());
@@ -277,21 +217,7 @@ void   Simulate(int nprimary, double eprimary, bool iselectron, double lbox, Sim
                          if (isMSCHinge) {
                            // Sample angular deflection from GS distr. and apply it
                            // -----------------------------------------------------
-                           const double dum0 = elData.GetTheGSTables()->SampleAngularDeflection(theEkin0, Random::UniformRand(), Random::UniformRand());
-                           const double cost = std::max(-1.0, std::min(1.0, dum0));
-                           const double sint = std::sqrt((1.0-cost)*(1.0+cost));
-                           // smaple \phi: uniform in [0,2Pi] <== spherical symmetry of the scattering potential
-                           const double phi  = 2.0*kPI*Random::UniformRand();
-                           // compute new direction (relative to 0,0,1 i.e. in the scattering frame)
-                           double u1 = sint*std::cos(phi);
-                           double u2 = sint*std::sin(phi);
-                           double u3 = cost;
-                           // rotate new direction from the scattering to the lab frame
-                           RotateToLabFrame(u1, u2, u3, track.fDirection[0], track.fDirection[1], track.fDirection[2]);
-                           // update track direction
-                           track.fDirection[0] = u1;
-                           track.fDirection[1] = u2;
-                           track.fDirection[2] = u3;
+                           PerformMSCAngularDeflection(track, theEkin0, elData.GetTheGSTables());
                            // -----------------------------------------------------
                            // set the #tr1-mfp left to the remaining, i.e. after hinge part
                            numTr1MFP   = numTr1MFP0;
@@ -727,6 +653,100 @@ void RotateToLabFrame(double &u, double &v, double &w, double u1, double u2, dou
 
 void RotateToLabFrame(double* dir, double* refdir) {
   RotateToLabFrame(dir[0], dir[1], dir[2], refdir[0], refdir[1], refdir[2]);
+}
+
+
+// It is assumed that track.fEkin > gamma-cut!
+// (Interaction is not possible otherwise)
+void PerformBrem(Track& track, SimSBTables* theSBTable) {
+  const double kPI            = 3.1415926535897932;
+  const double kEMC2          = 0.510991;
+  const double kHalfSqrt2EMC2 = kEMC2 * 0.7071067812;
+  // sample energy transferred to the emitted gamma photon
+  const double eGamma = theSBTable->SampleEnergyTransfer(track.fEkin,
+                                                         track.fMatIndx,
+                                                         Random::UniformRand(),
+                                                         Random::UniformRand(),
+                                                        Random::UniformRand());
+ // insert the secondary gamma track into the stack
+ Track& aTrack        = TrackStack::Instance().Insert();
+ aTrack.fType         = 0;
+ aTrack.fEkin         = eGamma;
+ aTrack.fMatIndx      = track.fMatIndx;
+ aTrack.fPosition[0]  = track.fPosition[0];
+ aTrack.fPosition[1]  = track.fPosition[1];
+ aTrack.fPosition[2]  = track.fPosition[2];
+ aTrack.fBoxIndx[0]   = track.fBoxIndx[0];
+ aTrack.fBoxIndx[1]   = track.fBoxIndx[1];
+ aTrack.fBoxIndx[2]   = track.fBoxIndx[2];
+ //
+ // compute emission direction (rough approximation in DPM by the mean)
+ // and no deflection of the primary e-
+ const double dum0    = kHalfSqrt2EMC2/(track.fEkin+kEMC2);
+ const double cost    = std::max(-1.0, std::min(1.0, 1.0-dum0*dum0));
+ const double sint    = std::sqrt((1.0+cost)*(1.0-cost));
+ const double phi     = 2.0*kPI*Random::UniformRand();
+ aTrack.fDirection[0] = sint*std::cos(phi);
+ aTrack.fDirection[1] = sint*std::sin(phi);
+ aTrack.fDirection[2] = cost;
+ RotateToLabFrame(aTrack.fDirection, track.fDirection);
+ // decrease the primary energy:
+ track.fEkin = track.fEkin-eGamma;
+}
+
+// It is assumed that track.fEkin > 2*electron-cut!
+// (Interaction is not possible otherwise)
+void PerformMoller(Track& track, SimMollerTables* theMollerTable) {
+  const double kPI     = 3.1415926535897932;
+  const double kEMC2   = 0.510991;
+  const double k2EMC2  = 2.0*kEMC2;
+  const double secEkin = theMollerTable->SampleEnergyTransfer( track.fEkin,
+                                                               Random::UniformRand(),
+                                                               Random::UniformRand(),
+                                                               Random::UniformRand());
+  const double cost    = std::sqrt(secEkin*(track.fEkin+k2EMC2)/(track.fEkin*(secEkin+k2EMC2)));
+  const double secCost = std::min(1.0, cost);
+  // insert the secondary e- track into the stack
+  Track& aTrack        = TrackStack::Instance().Insert();
+  aTrack.fType         = -1;
+  aTrack.fEkin         = secEkin;
+  aTrack.fMatIndx      = track.fMatIndx;
+  aTrack.fPosition[0]  = track.fPosition[0];
+  aTrack.fPosition[1]  = track.fPosition[1];
+  aTrack.fPosition[2]  = track.fPosition[2];
+  aTrack.fBoxIndx[0]   = track.fBoxIndx[0];
+  aTrack.fBoxIndx[1]   = track.fBoxIndx[1];
+  aTrack.fBoxIndx[2]   = track.fBoxIndx[2];
+  const double sint    = std::sqrt((1.0+secCost)*(1.0-secCost));
+  const double phi     = 2.0*kPI*Random::UniformRand();
+  aTrack.fDirection[0] = sint*std::cos(phi);
+  aTrack.fDirection[1] = sint*std::sin(phi);
+  aTrack.fDirection[2] = secCost;
+  RotateToLabFrame(aTrack.fDirection, track.fDirection);
+  // decrease primary energy: DMP do not deflect the primary
+  track.fEkin -= secEkin;
+}
+
+
+void PerformMSCAngularDeflection(Track& track, double ekin0, SimGSTables* theGSTables) {
+  const double kPI  = 3.1415926535897932;
+  const double dum0 = theGSTables->SampleAngularDeflection( ekin0,
+                                                            Random::UniformRand(),
+                                                            Random::UniformRand());
+  const double cost = std::max(-1.0, std::min(1.0, dum0));
+  const double sint = std::sqrt((1.0-cost)*(1.0+cost));
+  // smaple \phi: uniform in [0,2Pi] <== spherical symmetry of the scattering potential
+  const double phi  = 2.0*kPI*Random::UniformRand();
+  // compute new direction (relative to 0,0,1 i.e. in the scattering frame)
+  double u1 = sint*std::cos(phi);
+  double u2 = sint*std::sin(phi);
+  double u3 = cost;
+  // rotate new direction from the scattering to the lab frame
+  RotateToLabFrame(u1, u2, u3, track.fDirection[0], track.fDirection[1], track.fDirection[2]);
+  // update track direction
+  track.fDirection[0] = u1;
+  track.fDirection[1] = u2;
+  track.fDirection[2] = u3;
 }
 
 

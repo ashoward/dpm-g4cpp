@@ -94,7 +94,9 @@ public:
               fTheG4MaterialNames[2] = "G4_BONE_COMPACT_ICRU";
               break;
       // indx = 4 : homogeneous Titatnium with all default but the material list
-      case 4: fTheG4MaterialNames.resize(1);
+      case 4: fMscStepSlow  = 2.0; // [mm]
+              fMscStepShigh = 5.0; // [mm]
+              fTheG4MaterialNames.resize(1);
               fTheG4MaterialNames[0] = "G4_Ti";
               break;
       // indx = 5 : homogeneous Tungsten with all default but the material list

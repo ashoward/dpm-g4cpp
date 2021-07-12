@@ -19,12 +19,12 @@ include ( ${Geant4_USE_FILE} )
 #-------------------------------------------------------------------------------
 # Set the CXX flags and default build type
 #
-#if (NOT EXISTS ${CMAKE_BINARY_DIR}/CMakeCache.txt)
-#  if (NOT CMAKE_BUILD_TYPE)
-#    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
-#  endif()
-#endif()
-#set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
+if (NOT EXISTS ${CMAKE_BINARY_DIR}/CMakeCache.txt)
+  if (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
+  endif()
+endif()
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
 
 
 
@@ -68,3 +68,7 @@ target_link_libraries (dpm_GenerateData  ${Geant4_LIBRARIES})
 
 add_executable ( dpm_Simulate ${CMAKE_SOURCE_DIR}/dpm_Simulate.cc ${cxx_sources_SIM})
 target_link_libraries (dpm_Simulate)
+
+## add model level test for bremsstrahlung
+add_executable ( test_brem ${CMAKE_SOURCE_DIR}/test_brem.cc ${cxx_sources_SIM})
+target_link_libraries (test_brem)

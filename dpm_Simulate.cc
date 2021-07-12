@@ -33,7 +33,7 @@ static int           gConfigIndex       =  0;       // 0 that corresponds to a h
 //
 static struct option options[] = {
   {"primary-particle    (possible particle names: e-, gamma)            - default: e-"     , required_argument, 0, 'p'},
-  {"primary-energy      (in [MeV] units)                                - default: 0.1"    , required_argument, 0, 'e'},
+  {"primary-energy      (in [MeV] units)                                - default: 15"     , required_argument, 0, 'e'},
   {"number-of-histories (number of primary events to simulate)          - default: 1.0E+5" , required_argument, 0, 'n'},
   {"input-data-dir      (where the pre-generated data are located)      - default: ./data" , required_argument, 0, 'd'},
   {"voxel-size          (size of the voxel/box in [mm])                 - default: 1.0"    , required_argument, 0, 'b'},
@@ -41,7 +41,7 @@ static struct option options[] = {
   {"help"                                                                                  , no_argument      , 0, 'h'},
   {0, 0, 0, 0}
 };
-// auxiliary functions fot obtaining input arguments
+// auxiliary functions for obtaining input arguments
 void Help();
 void GetOpt(int argc, char *argv[]);
 
