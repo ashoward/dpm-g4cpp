@@ -24,6 +24,7 @@ class SimPhotonData;
 
 class SimSBTables;
 class SimMollerTables;
+class SimGSTables;
 
 class Track;
 
@@ -78,6 +79,13 @@ void   RotateToLabFrame(double* dir, double* refdir);
 void   PerformBrem(Track& track, SimSBTables* theSBTable);
 // Auxiliary funtion for ionisation (Moller) final state generation.
 void   PerformMoller(Track& track, SimMollerTables* theMollerTable);
+// Auxiliary funtion to perform angular delfection due to MSC.
+// NOTE: that angular deflection is applied beween the pre- and post-step point
+//       while it needs to be computed at the e- energy at the pre-step point.
+//       The pre-step point kinetic energy is `ekin0` while the current kinetic
+//       energy is `track.fEkin`.
+void PerformMSCAngularDeflection(Track& track, double ekin0, SimGSTables* theGSTables);
+
 
 // Auxiliary funtion for simple e+e- annihilation
 void   PerformAnnihilation(Track& track);

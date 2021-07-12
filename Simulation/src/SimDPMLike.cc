@@ -38,8 +38,6 @@
 
 
 void   Simulate(int nprimary, double eprimary, bool iselectron, double lbox, SimMaterialData& matData, SimElectronData& elData, SimPhotonData& phData, int geomIndex) {
-  const double kPI            = 3.1415926535897932;
-  //
   // create the simple geometry
   Geom geom(lbox, &matData, geomIndex);
   //
@@ -219,21 +217,7 @@ void   Simulate(int nprimary, double eprimary, bool iselectron, double lbox, Sim
                          if (isMSCHinge) {
                            // Sample angular deflection from GS distr. and apply it
                            // -----------------------------------------------------
-                           const double dum0 = elData.GetTheGSTables()->SampleAngularDeflection(theEkin0, Random::UniformRand(), Random::UniformRand());
-                           const double cost = std::max(-1.0, std::min(1.0, dum0));
-                           const double sint = std::sqrt((1.0-cost)*(1.0+cost));
-                           // smaple \phi: uniform in [0,2Pi] <== spherical symmetry of the scattering potential
-                           const double phi  = 2.0*kPI*Random::UniformRand();
-                           // compute new direction (relative to 0,0,1 i.e. in the scattering frame)
-                           double u1 = sint*std::cos(phi);
-                           double u2 = sint*std::sin(phi);
-                           double u3 = cost;
-                           // rotate new direction from the scattering to the lab frame
-                           RotateToLabFrame(u1, u2, u3, track.fDirection[0], track.fDirection[1], track.fDirection[2]);
-                           // update track direction
-                           track.fDirection[0] = u1;
-                           track.fDirection[1] = u2;
-                           track.fDirection[2] = u3;
+                           PerformMSCAngularDeflection(track, theEkin0, elData.GetTheGSTables());
                            // -----------------------------------------------------
                            // set the #tr1-mfp left to the remaining, i.e. after hinge part
                            numTr1MFP   = numTr1MFP0;
@@ -741,6 +725,28 @@ void PerformMoller(Track& track, SimMollerTables* theMollerTable) {
   RotateToLabFrame(aTrack.fDirection, track.fDirection);
   // decrease primary energy: DMP do not deflect the primary
   track.fEkin -= secEkin;
+}
+
+
+void PerformMSCAngularDeflection(Track& track, double ekin0, SimGSTables* theGSTables) {
+  const double kPI  = 3.1415926535897932;
+  const double dum0 = theGSTables->SampleAngularDeflection( ekin0,
+                                                            Random::UniformRand(),
+                                                            Random::UniformRand());
+  const double cost = std::max(-1.0, std::min(1.0, dum0));
+  const double sint = std::sqrt((1.0-cost)*(1.0+cost));
+  // smaple \phi: uniform in [0,2Pi] <== spherical symmetry of the scattering potential
+  const double phi  = 2.0*kPI*Random::UniformRand();
+  // compute new direction (relative to 0,0,1 i.e. in the scattering frame)
+  double u1 = sint*std::cos(phi);
+  double u2 = sint*std::sin(phi);
+  double u3 = cost;
+  // rotate new direction from the scattering to the lab frame
+  RotateToLabFrame(u1, u2, u3, track.fDirection[0], track.fDirection[1], track.fDirection[2]);
+  // update track direction
+  track.fDirection[0] = u1;
+  track.fDirection[1] = u2;
+  track.fDirection[2] = u3;
 }
 
 
