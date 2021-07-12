@@ -68,3 +68,7 @@ target_link_libraries (dpm_GenerateData  ${Geant4_LIBRARIES})
 
 add_executable ( dpm_Simulate ${CMAKE_SOURCE_DIR}/dpm_Simulate.cc ${cxx_sources_SIM})
 target_link_libraries (dpm_Simulate)
+
+## add model level test for bremsstrahlung
+add_executable ( test_brem ${CMAKE_SOURCE_DIR}/test_brem.cc ${cxx_sources_SIM})
+target_link_libraries (test_brem)
