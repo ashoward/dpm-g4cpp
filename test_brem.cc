@@ -35,7 +35,7 @@
 
 #include <getopt.h>
 
-static std::string   gInputDataDir("./data");       // location of the pre-generated data
+static std::string   gInputDataDir("../data");       // location of the pre-generated data
 static double        gPrimaryEnergy     =  12.345;  // primary particle energy in [MeV] (> gamma-cut)
 static int           gNumPrimaries      =  1.0E+5;  // generate 100 000 samples from the brem. interaction
 static int           gMaterialIndex     =       0;  // material index (one of those data generated for)
@@ -74,6 +74,8 @@ int main(int argc, char *argv[]) {
   double  hdel = (xmax-xmin)/(hbins-1);
   double ihdel = 1./hdel;
   std::vector<double> theHist(hbins, 0.);
+  std::vector<double> theCosineHist(hbins, 0.);
+
   // create a primary and secondary track
   Track  primaryTrack;
   Track  secondaryTrack;
@@ -94,6 +96,9 @@ int main(int argc, char *argv[]) {
     TrackStack::Instance().PopIntoThisTrack(secondaryTrack);
     // get the secondary (emitted photon) energy
     const double theK  =  secondaryTrack.fEkin;
+    const double theCost = secondaryTrack.fDirection[2];
+    theCosineHist[(int)(theCost * hbins)] += 1;
+
     // compute the reduced photon energy k/E_0
     double redPhEnergy = theK/gPrimaryEnergy;
     if (redPhEnergy>0.0) {
@@ -107,13 +112,20 @@ int main(int argc, char *argv[]) {
     norm += 0.5*hdel*(theHist[ih]+theHist[ih+1]);
   }
   norm = 1./norm;
-  FILE* f = fopen("res_brem_test_ph_energy.dat","w");
+  FILE* f = fopen("../output/res_brem_test_ph_energy.dat","w");
   for (int ih=0; ih<hbins-1; ++ih) {
     fprintf(f, "%d %lg %lg\n", ih, xmin+(ih+0.5)*hdel, theHist[ih]*norm);
   }
   fclose(f);
+  const double cos_norm =
+    1. / std::accumulate(theCosineHist.begin(), theCosineHist.end(), 0.);
 
- return 0;
+  FILE *f_cos = fopen("../output/res_brem_test_cost.dat", "w");
+  for (int ih = 0; ih < hbins; ++ih) {
+    fprintf(f_cos, "%d %lg\n", ih, theCosineHist[ih]*cos_norm);
+  }
+  fclose(f_cos);
+  return 0;
 }
 
 
