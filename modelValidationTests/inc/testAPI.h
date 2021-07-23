@@ -10,7 +10,6 @@
 #include <utility>
 #include <vector>
 
-
 class AbstractTest {
  protected:
   const std::string gInputDataDir;
@@ -29,7 +28,7 @@ class AbstractTest {
   explicit AbstractTest(std::string gInputDataDir = "../data",
                         double gPrimaryEnergy = 12.345,
                         int gNumPrimaries = 1.0E+5,
-                        int gMaterialIndex = 0);
+                        int gMaterialIndex = 0, int hbins = 101);
   void writeHists(const std::string &filenamePrefix);
   __attribute__((unused)) std::vector<std::tuple<double, double>> getEnergyHist();
   __attribute__((unused)) std::vector<std::tuple<double, double>> getCosHist();
@@ -42,11 +41,12 @@ class BremTest : public AbstractTest {
                     gInputDataDir = "../data",
                     double gPrimaryEnergy = 12.345,
                     int gNumPrimaries = 1.0E+5,
-                    int gMaterialIndex = 0
+                    int gMaterialIndex = 0, int hbins = 101
   ) : AbstractTest(std::move(gInputDataDir),
                    gPrimaryEnergy,
                    gNumPrimaries,
-                   gMaterialIndex
+                   gMaterialIndex,
+                   hbins
   ) {}
   void simulate() final;
   void writeHists();
@@ -58,11 +58,12 @@ class MollerTest : public AbstractTest {
                       gInputDataDir = "../data",
                       double gPrimaryEnergy = 12.345,
                       int gNumPrimaries = 1.0E+5,
-                      int gMaterialIndex = 0
+                      int gMaterialIndex = 0, int hbins = 101
   ) : AbstractTest(std::move(gInputDataDir),
                    gPrimaryEnergy,
                    gNumPrimaries,
-                   gMaterialIndex
+                   gMaterialIndex,
+                   hbins
   ) {}
   void simulate() final;
   void writeHists();
@@ -74,11 +75,12 @@ class MSCAngularDeflectionTest : public AbstractTest {
                                     gInputDataDir = "../data",
                                     double gPrimaryEnergy = 12.345,
                                     int gNumPrimaries = 1.0E+5,
-                                    int gMaterialIndex = 0
+                                    int gMaterialIndex = 0, int hbins = 101
   ) : AbstractTest(std::move(gInputDataDir),
                    gPrimaryEnergy,
                    gNumPrimaries,
-                   gMaterialIndex
+                   gMaterialIndex,
+                   hbins
   ) {}
   void simulate() final;
   void writeHists();

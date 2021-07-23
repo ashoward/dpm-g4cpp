@@ -76,11 +76,11 @@ target_link_libraries (dpm_Simulate)
 add_executable ( test_brem ${CMAKE_SOURCE_DIR}/test_brem.cc ${cxx_sources_SIM})
 target_link_libraries (test_brem)
 
-add_executable(modeltests model_validation.cpp ${validation_sources} ${cxx_sources_SIM})
-target_link_libraries (modeltests)
-
 add_library(validation STATIC ${validation_sources} ${cxx_sources_SIM})
 target_link_libraries(validation)
+
+add_executable(modeltests model_validation.cpp)
+target_link_libraries (modeltests validation)
 
 install (TARGETS validation DESTINATION ${CMAKE_SOURCE_DIR}/lib)
 install (FILES  ${CMAKE_SOURCE_DIR}/modelValidationTests/inc/testAPI.h DESTINATION ${CMAKE_SOURCE_DIR}/lib)

@@ -18,17 +18,16 @@
 AbstractTest::AbstractTest(std::string g_input_data_dir,
                            double gPrimaryEnergy,
                            int gNumPrimaries,
-                           int gMaterialIndex)
+                           int gMaterialIndex, int hbins)
   : gInputDataDir(std::move(g_input_data_dir)),
     gPrimaryEnergy(gPrimaryEnergy),
     gNumPrimaries(gNumPrimaries),
-    gMaterialIndex(gMaterialIndex) {
+    gMaterialIndex(gMaterialIndex), hbins(hbins) {
 
   SimMaterialData theSimMaterialData;
   theSimMaterialData.Load(gInputDataDir);
   // create a histogram of the x =  log10(k/E_0)
   const double gammaCut = theSimMaterialData.fGammaCut;
-  hbins = 101;
   xmin = std::log10(gammaCut / gPrimaryEnergy);
   xmax = 0.1;
   hdel = (xmax - xmin) / (hbins - 1);
