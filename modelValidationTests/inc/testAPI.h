@@ -8,7 +8,8 @@
 #include <string>
 #include <tuple>
 #include <utility>
-#include "SimMaterialData.hh"
+#include <vector>
+
 
 class AbstractTest {
  protected:
@@ -16,7 +17,6 @@ class AbstractTest {
   const double gPrimaryEnergy;
   const int gNumPrimaries;
   const int gMaterialIndex;
-  SimMaterialData theSimMaterialData;
   // histogram parameter
   int hbins;
   double xmin;

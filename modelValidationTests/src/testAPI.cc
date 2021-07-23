@@ -4,6 +4,7 @@
 
 #include "testAPI.h"
 #include "SimSBTables.hh"
+#include "SimMaterialData.hh"
 
 #include <cmath>
 #include <numeric>
@@ -22,6 +23,8 @@ AbstractTest::AbstractTest(std::string g_input_data_dir,
     gPrimaryEnergy(gPrimaryEnergy),
     gNumPrimaries(gNumPrimaries),
     gMaterialIndex(gMaterialIndex) {
+
+  SimMaterialData theSimMaterialData;
   theSimMaterialData.Load(gInputDataDir);
   // create a histogram of the x =  log10(k/E_0)
   const double gammaCut = theSimMaterialData.fGammaCut;
