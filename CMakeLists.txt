@@ -47,7 +47,9 @@ file ( GLOB headers_SIM
 file ( GLOB cxx_sources_SIM
     ${CMAKE_SOURCE_DIR}/Simulation/src/*.cc
   )
-
+file ( GLOB validation_sources
+        ${CMAKE_SOURCE_DIR}/modelValidationTests/src/*.cc
+        )
 
 
 #----------------------------------------------------------------------------
@@ -58,6 +60,7 @@ include_directories ( ${Geant4_INCLUDE_DIR}
                       ${CMAKE_SOURCE_DIR}/DataInit/inc
                       ${CMAKE_SOURCE_DIR}/Utils/inc
                       ${CMAKE_SOURCE_DIR}/Simulation/inc/
+                      ${CMAKE_SOURCE_DIR}/modelValidationTests/inc/
                     )
 
 #----------------------------------------------------------------------------
@@ -72,3 +75,6 @@ target_link_libraries (dpm_Simulate)
 ## add model level test for bremsstrahlung
 add_executable ( test_brem ${CMAKE_SOURCE_DIR}/test_brem.cc ${cxx_sources_SIM})
 target_link_libraries (test_brem)
+
+add_executable(modeltests model_validation.cpp ${validation_sources} ${cxx_sources_SIM})
+target_link_libraries (modeltests)
