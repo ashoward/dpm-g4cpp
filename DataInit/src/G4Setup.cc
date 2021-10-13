@@ -4,7 +4,6 @@
 // Geant4 includes
 #include "G4SystemOfUnits.hh"
 
-#include "G4NistManager.hh"
 #include "G4Material.hh"
 #include "G4String.hh"
 
@@ -28,6 +27,8 @@
 
 #include "Spline.hh"
 
+#include "DPMMaterialManager.hh"
+
 // builds a fake Geant4 geometry with all materials given just to be able to produce material-cuts couple
 void FakeG4Setup (const std::vector<std::string>& g4Materials, double electronCutInEnergy, double gammaCutInEnergy, int verbose) {
   //
@@ -36,7 +37,7 @@ void FakeG4Setup (const std::vector<std::string>& g4Materials, double electronCu
   G4double wDimY      = 0.6*mm;
   G4double wDimZ      = 0.6*mm;
   G4Material* wMat    = new G4Material("Universe", CLHEP::universe_mean_density, 1);
-  wMat->AddElement(G4NistManager::Instance()->FindOrBuildElement(1), 1.0);
+  wMat->AddElement(DPMMaterialManager::Instance()->FindOrBuildElement(1), 1.0);
   G4Box*           sW = new G4Box ("Box",wDimX, wDimY, wDimZ);
   G4LogicalVolume* lW = new G4LogicalVolume(sW,wMat,"Box",0,0,0);
   G4PVPlacement*   pW = new G4PVPlacement(0,G4ThreeVector(),"Box",lW,0,false,0);
@@ -50,9 +51,9 @@ void FakeG4Setup (const std::vector<std::string>& g4Materials, double electronCu
   const G4double  halfX  =  0.5/numMat;  // half width of one material-box
   const G4double     x0  = -0.5+halfX;   // start x-position of the first material-box
   for (int im=0; im<numMat; ++im) {
-    G4Material*      mat  = G4NistManager::Instance()->FindOrBuildMaterial(g4Materials[im]);
+    G4Material*      mat  = DPMMaterialManager::Instance()->FindOrBuildMaterial(g4Materials[im]);
     if (mat==nullptr) {
-      std::cerr << "  *** G4Setup::FakeG4Setup(): unknown Geant4 NIST material = " << g4Materials[im]
+      std::cerr << "  *** G4Setup::FakeG4Setup(): unknown DPM material = " << g4Materials[im]
                 << std::endl;
       exit(-1);
     }
@@ -74,7 +75,7 @@ void FakeG4Setup (const std::vector<std::string>& g4Materials, double electronCu
   partTable->SetReadiness();
   //
   for (G4int im=0; im<numMat; ++im) {
-    G4Material*  mat = G4NistManager::Instance()->GetMaterial(im+1);
+    G4Material*  mat = DPMMaterialManager::Instance()->GetMaterial(im+1);
 //    std::cout << mat->GetName() << std::endl;
     G4ProductionCuts* iPcut = new G4ProductionCuts();
     iPcut->SetProductionCut(theCutInAbsLenght[im], 0); // set cut for gamma
