@@ -28,7 +28,7 @@
 // GEANT4 Class file
 //
 //
-// File name:     DPMManager
+// File name:     DPMMaterialManager
 //
 // Author:        Vladimir Ivanchenko
 //
@@ -55,25 +55,25 @@
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-#include "DPMManager.hh"
+#include "DPMMaterialManager.hh"
 #include "G4Isotope.hh"
 #include "G4Threading.hh"
 
-DPMManager* DPMManager::instance = nullptr;
+DPMMaterialManager* DPMMaterialManager::instance = nullptr;
 #ifdef G4MULTITHREADED
-  G4Mutex DPMManager::nistManagerMutex = G4MUTEX_INITIALIZER;
+  G4Mutex DPMMaterialManager::nistManagerMutex = G4MUTEX_INITIALIZER;
 #endif
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo.....
 
-DPMManager* DPMManager::Instance()
+DPMMaterialManager* DPMMaterialManager::Instance()
 {
   if (instance == nullptr) {
 #ifdef G4MULTITHREADED
     G4MUTEXLOCK(&nistManagerMutex);
     if (instance == nullptr) {
 #endif
-      static DPMManager manager;
+      static DPMMaterialManager manager;
       instance = &manager;
 #ifdef G4MULTITHREADED
     }
@@ -85,7 +85,7 @@ DPMManager* DPMManager::Instance()
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-DPMManager::~DPMManager()
+DPMMaterialManager::~DPMMaterialManager()
 {
   //  G4cout << "NistManager: start material destruction" << G4endl;
   const G4MaterialTable* theMaterialTable = G4Material::GetMaterialTable();
@@ -116,7 +116,7 @@ DPMManager::~DPMManager()
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 G4Material* 
-DPMManager::BuildMaterialWithNewDensity(const G4String& name,
+DPMMaterialManager::BuildMaterialWithNewDensity(const G4String& name,
 					   const G4String& basename, 
 					   G4double density,
 					   G4double temperature,
@@ -124,20 +124,20 @@ DPMManager::BuildMaterialWithNewDensity(const G4String& name,
 {
   G4Material* bmat = FindOrBuildMaterial(name);
   if(bmat) {
-    G4cout << "DPMManager::BuildMaterialWithNewDensity ERROR: " << G4endl;
+    G4cout << "DPMMaterialManager::BuildMaterialWithNewDensity ERROR: " << G4endl;
     G4cout << " New material <" << name << "> cannot be built because material"
 	   << " with the same name already exists." << G4endl;
-    G4Exception("DPMManager::BuildMaterialWithNewDensity()", "mat101",
+    G4Exception("DPMMaterialManager::BuildMaterialWithNewDensity()", "mat101",
                  FatalException, "Wrong material name");
     return 0;
   }
   bmat = FindOrBuildMaterial(basename);
   if(!bmat) {
-    G4cout << "DPMManager::BuildMaterialWithNewDensity ERROR: " << G4endl;
+    G4cout << "DPMMaterialManager::BuildMaterialWithNewDensity ERROR: " << G4endl;
     G4cout << " New material <" << name << "> cannot be built because " 
 	   << G4endl;
     G4cout << " base material <" << basename << "> does not exist." << G4endl;
-    G4Exception("DPMManager::BuildMaterialWithNewDensity()", "mat102",
+    G4Exception("DPMMaterialManager::BuildMaterialWithNewDensity()", "mat102",
                  FatalException, "Wrong material name");    
     return 0;
   }
@@ -156,7 +156,7 @@ DPMManager::BuildMaterialWithNewDensity(const G4String& name,
   
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void DPMManager::PrintElement(const G4String& symbol) const
+void DPMMaterialManager::PrintElement(const G4String& symbol) const
 {
   if (symbol == "all") { elmBuilder->PrintElement(0); }
   else                 { elmBuilder->PrintElement(elmBuilder->GetZ(symbol)); }
@@ -164,7 +164,7 @@ void DPMManager::PrintElement(const G4String& symbol) const
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void DPMManager::PrintG4Element(const G4String& name) const
+void DPMMaterialManager::PrintG4Element(const G4String& name) const
 {
   const G4ElementTable* theElementTable = G4Element::GetElementTable();
   size_t nelm = theElementTable->size();
@@ -178,7 +178,7 @@ void DPMManager::PrintG4Element(const G4String& name) const
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void DPMManager::PrintG4Material(const G4String& name) const
+void DPMMaterialManager::PrintG4Material(const G4String& name) const
 {
   const G4MaterialTable* theMaterialTable = G4Material::GetMaterialTable();
   size_t nmat = theMaterialTable->size();
@@ -192,7 +192,7 @@ void DPMManager::PrintG4Material(const G4String& name) const
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void DPMManager::SetVerbose(G4int val)
+void DPMMaterialManager::SetVerbose(G4int val)
 {
 #ifdef G4MULTITHREADED
   G4MUTEXLOCK(&nistManagerMutex);
@@ -207,7 +207,7 @@ void DPMManager::SetVerbose(G4int val)
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-DPMManager::DPMManager()
+DPMMaterialManager::DPMMaterialManager()
 {
   nElements  = 0;
   nMaterials = 0;
@@ -231,7 +231,7 @@ DPMManager::DPMManager()
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-G4ICRU90StoppingData* DPMManager::GetICRU90StoppingData()
+G4ICRU90StoppingData* DPMMaterialManager::GetICRU90StoppingData()
 {
   if (!fICRU90) {
 #ifdef G4MULTITHREADED
@@ -249,7 +249,7 @@ G4ICRU90StoppingData* DPMManager::GetICRU90StoppingData()
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void DPMManager::SetDensityEffectCalculatorFlag(const G4String& mname,
+void DPMMaterialManager::SetDensityEffectCalculatorFlag(const G4String& mname,
                                                    G4bool val)
 {
 #ifdef G4MULTITHREADED
@@ -270,7 +270,7 @@ void DPMManager::SetDensityEffectCalculatorFlag(const G4String& mname,
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void DPMManager::SetDensityEffectCalculatorFlag(G4Material* mat, G4bool val)
+void DPMMaterialManager::SetDensityEffectCalculatorFlag(G4Material* mat, G4bool val)
 {
   if(mat) { mat->ComputeDensityEffectOnFly(val); }
 }

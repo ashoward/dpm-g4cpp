@@ -28,7 +28,7 @@
 //
 // GEANT4 Class header file
 //
-// File name:     DPMManager
+// File name:     DPMMaterialManager
 //
 // Author:        Vladimir Ivanchenko
 //
@@ -61,8 +61,8 @@
 // -------------------------------------------------------------------
 //
 
-#ifndef DPMManager_h
-#define DPMManager_h 1
+#ifndef DPMMaterialManager_h
+#define DPMMaterialManager_h 1
 
 #include <vector>
 #include <CLHEP/Units/PhysicalConstants.h>
@@ -78,13 +78,13 @@
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
-class DPMManager
+class DPMMaterialManager
 {
 
 public:
 
-  static DPMManager* Instance();
-  ~DPMManager();
+  static DPMMaterialManager* Instance();
+  ~DPMMaterialManager();
 
   // Get G4Element by index
   //
@@ -289,9 +289,9 @@ public:
 
 private:
 
-  explicit DPMManager();
+  explicit DPMMaterialManager();
 
-  static DPMManager* instance;
+  static DPMMaterialManager* instance;
   
   std::vector<G4Element*>  elements;
   std::vector<G4Material*> materials;
@@ -316,14 +316,14 @@ private:
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-inline size_t DPMManager::GetNumberOfMaterials() const
+inline size_t DPMMaterialManager::GetNumberOfMaterials() const
 {
   return nMaterials;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-inline G4Element* DPMManager::GetElement(size_t index) const
+inline G4Element* DPMMaterialManager::GetElement(size_t index) const
 {
   const G4ElementTable* theElementTable = G4Element::GetElementTable();
   return (index < theElementTable->size()) ? (*theElementTable)[index] : nullptr; 
@@ -332,7 +332,7 @@ inline G4Element* DPMManager::GetElement(size_t index) const
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 inline 
-G4Element* DPMManager::FindElement(G4int Z) const
+G4Element* DPMMaterialManager::FindElement(G4int Z) const
 {
   return elmBuilder->FindElement(Z);
 }
@@ -340,7 +340,7 @@ G4Element* DPMManager::FindElement(G4int Z) const
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 inline 
-G4Element* DPMManager::FindOrBuildElement(G4int Z, G4bool isotopes)
+G4Element* DPMMaterialManager::FindOrBuildElement(G4int Z, G4bool isotopes)
 {
   return elmBuilder->FindOrBuildElement(Z, isotopes);
 }
@@ -348,7 +348,7 @@ G4Element* DPMManager::FindOrBuildElement(G4int Z, G4bool isotopes)
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 inline
-G4Element* DPMManager::FindOrBuildElement(const G4String& symb,
+G4Element* DPMMaterialManager::FindOrBuildElement(const G4String& symb,
                                                    G4bool isotopes)
 {
   return elmBuilder->FindOrBuildElement(symb, isotopes);
@@ -356,28 +356,28 @@ G4Element* DPMManager::FindOrBuildElement(const G4String& symb,
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-inline size_t DPMManager::GetNumberOfElements() const
+inline size_t DPMMaterialManager::GetNumberOfElements() const
 { 
   return nElements;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-inline G4int DPMManager::GetZ(const G4String& symb) const
+inline G4int DPMMaterialManager::GetZ(const G4String& symb) const
 {
   return elmBuilder->GetZ(symb);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-inline G4double DPMManager::GetAtomicMassAmu(const G4String& symb) const
+inline G4double DPMMaterialManager::GetAtomicMassAmu(const G4String& symb) const
 {
   return elmBuilder->GetAtomicMassAmu(symb);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-inline G4double DPMManager::GetAtomicMassAmu(G4int Z) const
+inline G4double DPMMaterialManager::GetAtomicMassAmu(G4int Z) const
 {
   return elmBuilder->GetAtomicMassAmu(Z);
 }
@@ -385,7 +385,7 @@ inline G4double DPMManager::GetAtomicMassAmu(G4int Z) const
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 inline 
-G4double DPMManager::GetIsotopeMass(G4int Z, G4int N) const
+G4double DPMMaterialManager::GetIsotopeMass(G4int Z, G4int N) const
 {
   return elmBuilder->GetIsotopeMass(Z, N);
 }
@@ -393,7 +393,7 @@ G4double DPMManager::GetIsotopeMass(G4int Z, G4int N) const
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 inline 
-G4double DPMManager::GetAtomicMass(G4int Z, G4int N) const
+G4double DPMMaterialManager::GetAtomicMass(G4int Z, G4int N) const
 {
   return elmBuilder->GetAtomicMass(Z, N);
 }
@@ -401,7 +401,7 @@ G4double DPMManager::GetAtomicMass(G4int Z, G4int N) const
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 inline 
-G4double DPMManager::GetTotalElectronBindingEnergy(G4int Z) const
+G4double DPMMaterialManager::GetTotalElectronBindingEnergy(G4int Z) const
 {
   return elmBuilder->GetTotalElectronBindingEnergy(Z);
 }
@@ -409,7 +409,7 @@ G4double DPMManager::GetTotalElectronBindingEnergy(G4int Z) const
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 inline 
-G4double DPMManager::GetIsotopeAbundance(G4int Z, G4int N) const
+G4double DPMMaterialManager::GetIsotopeAbundance(G4int Z, G4int N) const
 {
   return elmBuilder->GetIsotopeAbundance(Z, N);
 }
@@ -417,7 +417,7 @@ G4double DPMManager::GetIsotopeAbundance(G4int Z, G4int N) const
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 inline 
-G4int DPMManager::GetNistFirstIsotopeN(G4int Z) const
+G4int DPMMaterialManager::GetNistFirstIsotopeN(G4int Z) const
 {
   return elmBuilder->GetNistFirstIsotopeN(Z);
 }
@@ -425,7 +425,7 @@ G4int DPMManager::GetNistFirstIsotopeN(G4int Z) const
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 inline 
-G4int DPMManager::GetNumberOfNistIsotopes(G4int Z) const
+G4int DPMMaterialManager::GetNumberOfNistIsotopes(G4int Z) const
 {
   return elmBuilder->GetNumberOfNistIsotopes(Z);
 }
@@ -433,35 +433,35 @@ G4int DPMManager::GetNumberOfNistIsotopes(G4int Z) const
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 inline 
-const std::vector<G4String>& DPMManager::GetNistElementNames() const
+const std::vector<G4String>& DPMMaterialManager::GetNistElementNames() const
 {
   return elmBuilder->GetElementNames();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-inline G4double DPMManager::GetMeanIonisationEnergy(G4int Z) const
+inline G4double DPMMaterialManager::GetMeanIonisationEnergy(G4int Z) const
 {
   return matBuilder->GetMeanIonisationEnergy(Z);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-inline G4double DPMManager::GetNominalDensity(G4int Z) const
+inline G4double DPMMaterialManager::GetNominalDensity(G4int Z) const
 {
   return matBuilder->GetNominalDensity(Z);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-inline void DPMManager::PrintElement(G4int Z) const
+inline void DPMMaterialManager::PrintElement(G4int Z) const
 {
   elmBuilder->PrintElement(Z);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-inline G4Material* DPMManager::GetMaterial(size_t index) const
+inline G4Material* DPMMaterialManager::GetMaterial(size_t index) const
 {
   const G4MaterialTable* theMaterialTable = G4Material::GetMaterialTable();
   return (index < theMaterialTable->size()) ? (*theMaterialTable)[index] : nullptr;
@@ -469,7 +469,7 @@ inline G4Material* DPMManager::GetMaterial(size_t index) const
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-inline G4int DPMManager::GetVerbose() const
+inline G4int DPMMaterialManager::GetVerbose() const
 {
   return verbose;
 }
@@ -477,7 +477,7 @@ inline G4int DPMManager::GetVerbose() const
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 inline
-G4Material* DPMManager::FindMaterial(const G4String& name) const
+G4Material* DPMMaterialManager::FindMaterial(const G4String& name) const
 {
   return matBuilder->FindMaterial(name);  
 }
@@ -485,7 +485,7 @@ G4Material* DPMManager::FindMaterial(const G4String& name) const
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 inline
-G4Material* DPMManager::FindOrBuildMaterial(const G4String& name,
+G4Material* DPMMaterialManager::FindOrBuildMaterial(const G4String& name,
 					       G4bool isotopes,
 					       G4bool warning)
 {
@@ -495,7 +495,7 @@ G4Material* DPMManager::FindOrBuildMaterial(const G4String& name,
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 inline 
-G4Material* DPMManager::FindSimpleMaterial(G4int Z) const
+G4Material* DPMMaterialManager::FindSimpleMaterial(G4int Z) const
 {
   return matBuilder->FindSimpleMaterial(Z);  
 }
@@ -503,14 +503,14 @@ G4Material* DPMManager::FindSimpleMaterial(G4int Z) const
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 inline 
-G4Material* DPMManager::FindOrBuildSimpleMaterial(G4int Z, G4bool warning)
+G4Material* DPMMaterialManager::FindOrBuildSimpleMaterial(G4int Z, G4bool warning)
 {
   return matBuilder->FindOrBuildSimpleMaterial(Z, warning);  
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-inline G4Material* DPMManager::ConstructNewMaterial(
+inline G4Material* DPMMaterialManager::ConstructNewMaterial(
                                       const G4String& name,
                                       const std::vector<G4String>& elm,
                                       const std::vector<G4int>& nbAtoms,
@@ -527,7 +527,7 @@ inline G4Material* DPMManager::ConstructNewMaterial(
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-inline G4Material* DPMManager::ConstructNewMaterial(
+inline G4Material* DPMMaterialManager::ConstructNewMaterial(
                                       const G4String& name,
                                       const std::vector<G4String>& elm,
                                       const std::vector<G4double>& w,
@@ -542,7 +542,7 @@ inline G4Material* DPMManager::ConstructNewMaterial(
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-inline G4Material* DPMManager::ConstructNewGasMaterial(
+inline G4Material* DPMMaterialManager::ConstructNewGasMaterial(
 				      const G4String& name,
                                       const G4String& nameNist,
 				      G4double temp, G4double pres, 
@@ -554,7 +554,7 @@ inline G4Material* DPMManager::ConstructNewGasMaterial(
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-inline G4Material* DPMManager::ConstructNewIdealGasMaterial(
+inline G4Material* DPMMaterialManager::ConstructNewIdealGasMaterial(
                                       const G4String& name,
                                       const std::vector<G4String>& elm,
                                       const std::vector<G4int>& nbAtoms,
@@ -568,7 +568,7 @@ inline G4Material* DPMManager::ConstructNewIdealGasMaterial(
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-inline void DPMManager::ListMaterials(const G4String& list) const
+inline void DPMMaterialManager::ListMaterials(const G4String& list) const
 {
   matBuilder->ListMaterials(list);
 }
@@ -576,42 +576,42 @@ inline void DPMManager::ListMaterials(const G4String& list) const
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 inline
-const std::vector<G4String>& DPMManager::GetNistMaterialNames() const
+const std::vector<G4String>& DPMMaterialManager::GetNistMaterialNames() const
 {
   return matBuilder->GetMaterialNames();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-inline G4double DPMManager::GetZ13(G4double A) const
+inline G4double DPMMaterialManager::GetZ13(G4double A) const
 {
   return g4pow->A13(A);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-inline G4double DPMManager::GetZ13(G4int Z) const
+inline G4double DPMMaterialManager::GetZ13(G4int Z) const
 {
   return g4pow->Z13(Z);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-inline G4double DPMManager::GetA27(G4int Z) const
+inline G4double DPMMaterialManager::GetA27(G4int Z) const
 {
   return (0 <= Z && Z < 101) ? POWERA27[Z] : 0.0;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-inline G4double DPMManager::GetLOGZ(G4int Z) const
+inline G4double DPMMaterialManager::GetLOGZ(G4int Z) const
 {
   return g4pow->logZ(Z);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-inline G4double DPMManager::GetLOGAMU(G4int Z) const
+inline G4double DPMMaterialManager::GetLOGAMU(G4int Z) const
 {
   return (0 <= Z && Z < 101) ? LOGAZ[Z] : 0.0;
 }

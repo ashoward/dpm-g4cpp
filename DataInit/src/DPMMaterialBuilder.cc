@@ -523,16 +523,10 @@ void DPMMaterialBuilder::ListMaterials(const G4String& mnam) const
 {
   if (mnam == "simple")           { ListNistSimpleMaterials(); }
   else if (mnam == "compound")    { ListNistCompoundMaterials(); }
-  else if (mnam == "hep")         { ListHepMaterials(); }
-  else if (mnam == "space")       { ListSpaceMaterials(); }
-  else if (mnam == "bio")         { ListBioChemicalMaterials(); }
 
   else if (mnam == "all") {
     ListNistSimpleMaterials();
     ListNistCompoundMaterials();
-    ListHepMaterials();
-    ListSpaceMaterials();
-    ListBioChemicalMaterials();
 
   } else {
     G4cout << "### DPMMaterialBuilder::ListMaterials: Warning " 
@@ -566,41 +560,6 @@ void DPMMaterialBuilder::ListNistCompoundMaterials() const
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-void DPMMaterialBuilder::ListHepMaterials() const
-{
-  G4cout << "=============================================================" << G4endl;
-  G4cout << "###           HEP & Nuclear Materials                      ##" << G4endl;
-  G4cout << "=============================================================" << G4endl;
-  G4cout << " Ncomp             Name      density(g/cm^3)  I(eV) ChFormula" << G4endl;
-  G4cout << "=============================================================" << G4endl;
-  for (G4int i=nNIST; i<nHEP; ++i) {DumpMix(i);}
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-void DPMMaterialBuilder::ListSpaceMaterials() const
-{
-  G4cout << "=============================================================" << G4endl;
-  G4cout << "###           Space ISS Materials                          ##" << G4endl;
-  G4cout << "=============================================================" << G4endl;
-  G4cout << " Ncomp             Name      density(g/cm^3)  I(eV) ChFormula" << G4endl;
-  G4cout << "=============================================================" << G4endl;
-  for (G4int i=nHEP; i<nSpace; ++i) {DumpMix(i);}
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-void DPMMaterialBuilder::ListBioChemicalMaterials() const
-{
-  G4cout << "=============================================================" << G4endl;
-  G4cout << "###          Bio-Chemical Materials                        ##" << G4endl;
-  G4cout << "=============================================================" << G4endl;
-  G4cout << " Ncomp             Name      density(g/cm^3)  I(eV) ChFormula" << G4endl;
-  G4cout << "=============================================================" << G4endl;
-  for (G4int i=nSpace; i<nMaterials; ++i) {DumpMix(i);}
-  G4cout << "=============================================================" << G4endl;
-}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -713,9 +672,6 @@ void DPMMaterialBuilder::Initialise()
   NistSimpleMaterials();
   NistCompoundMaterials();
   NistCompoundMaterials2();
-  HepAndNuclearMaterials();
-  SpaceMaterials();
-  BioChemicalMaterials();
 
   if (verbose > 1) { ListMaterials("all"); }
 }
