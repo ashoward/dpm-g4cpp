@@ -238,14 +238,6 @@ public:
                                   G4double  temp     = NTP_Temperature,
                                   G4double  pressure = CLHEP::STP_Pressure);
 
-  // enable/disable density effect calculator by material name
-  //
-  void SetDensityEffectCalculatorFlag(const G4String&, G4bool);
-
-  // enable/disable density effect calculator by material pointer
-  //
-  void SetDensityEffectCalculatorFlag(G4Material*, G4bool);
-
   // Get number of G4Materials
   //
   inline size_t GetNumberOfMaterials() const;
@@ -285,8 +277,6 @@ public:
   inline G4double GetLOGZ(G4int Z) const;
   inline G4double GetLOGAMU(G4int Z) const;
 
-  G4ICRU90StoppingData* GetICRU90StoppingData();
-
 private:
 
   explicit DPMMaterialManager();
@@ -296,7 +286,6 @@ private:
   std::vector<G4Element*>  elements;
   std::vector<G4Material*> materials;
 
-  G4ICRU90StoppingData*  fICRU90;
   DPMElementBuilder*  elmBuilder;
   DPMMaterialBuilder* matBuilder;
   G4Pow*                 g4pow;

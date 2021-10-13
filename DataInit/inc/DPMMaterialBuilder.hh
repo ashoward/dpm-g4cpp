@@ -159,6 +159,7 @@ private:
   void NistSimpleMaterials();
   void NistCompoundMaterials();
   void NistCompoundMaterials2();
+  void NistCompoundMaterials3();
 
   // add parameters of material from NIST DB to internal vectors
   // density in g/cm3, mean ionisation potential in eV

@@ -672,6 +672,7 @@ void DPMMaterialBuilder::Initialise()
   NistSimpleMaterials();
   NistCompoundMaterials();
   NistCompoundMaterials2();
+  NistCompoundMaterials3();
 
   if (verbose > 1) { ListMaterials("all"); }
 }
@@ -801,11 +802,6 @@ void DPMMaterialBuilder::NistCompoundMaterials()
   AddElementByWeightFraction( 9, 0.017422);
   AddElementByWeightFraction(20, 0.018378);
 
-  AddMaterial("G4_ADENINE", 1.6/*1.35*/, 0, 71.4, 3);
-  AddElementByAtomCount("C" ,  5);
-  AddElementByAtomCount("H" ,  5);
-  AddElementByAtomCount("N" ,  5);
-
   AddMaterial("G4_ADIPOSE_TISSUE_ICRP", 0.95, 0, 63.2, 7);
   AddElementByWeightFraction( 1, 0.114);
   AddElementByWeightFraction( 6, 0.598);
@@ -820,17 +816,6 @@ void DPMMaterialBuilder::NistCompoundMaterials()
   AddElementByWeightFraction( 7, 0.755267);
   AddElementByWeightFraction( 8, 0.231781);
   AddElementByWeightFraction(18, 0.012827);
-
-  AddMaterial("G4_ALANINE", 1.42, 0, 71.9, 4);
-  AddElementByAtomCount("C" ,  3);
-  AddElementByAtomCount("H" ,  7);
-  AddElementByAtomCount("N" ,  1);
-  AddElementByAtomCount("O" ,  2);
-
-  AddMaterial("G4_ANILINE", 1.0235, 0, 66.2, 3);
-  AddElementByAtomCount("C" ,  6);
-  AddElementByAtomCount("H" ,  7);
-  AddElementByAtomCount("N" ,  1);
 
   AddMaterial("G4_B-100_BONE", 1.45, 0, 85.9, 6);
   AddElementByWeightFraction( 1, 0.065471);
@@ -885,19 +870,6 @@ void DPMMaterialBuilder::NistCompoundMaterials()
   AddElementByWeightFraction(17, 0.003);
   AddElementByWeightFraction(19, 0.003);
 
-  AddMaterial("G4_CALCIUM_FLUORIDE", 3.18, 0, 166., 2);
-  AddElementByAtomCount("Ca",  1);
-  AddElementByAtomCount("F" ,  2);
-
-  AddMaterial("G4_CALCIUM_OXIDE", 3.3, 0, 176.1, 2);
-  AddElementByAtomCount("Ca",  1);
-  AddElementByAtomCount("O" ,  1);
-
-  AddMaterial("G4_CARBON_DIOXIDE", 0.00184212, 0, 85., 2, kStateGas);
-  AddElementByAtomCount("C" ,  1);
-  AddElementByAtomCount("O" ,  2);
-  chFormulas[nMaterials-1] = "CO_2";
-
   AddMaterial("G4_EYE_LENS_ICRP", 1.07, 0, 73.3, 8);
   AddElementByWeightFraction( 1, 0.096);
   AddElementByWeightFraction( 6, 0.195);
@@ -907,25 +879,6 @@ void DPMMaterialBuilder::NistCompoundMaterials()
   AddElementByWeightFraction(15, 0.001);
   AddElementByWeightFraction(16, 0.003);
   AddElementByWeightFraction(17, 0.001);
-
-  AddMaterial("G4_GEL_PHOTO_EMULSION", 1.2914, 0, 74.8, 5);
-  AddElementByWeightFraction( 1, 0.08118);
-  AddElementByWeightFraction( 6, 0.41606);
-  AddElementByWeightFraction( 7, 0.11124);
-  AddElementByWeightFraction( 8, 0.38064);
-  AddElementByWeightFraction(16, 0.01088);
-
-  AddMaterial("G4_GLUTAMINE", 1.46, 0, 73.3, 4);
-  AddElementByAtomCount("C" ,  5);
-  AddElementByAtomCount("H" , 10);
-  AddElementByAtomCount("N" ,  2);
-  AddElementByAtomCount("O" ,  3);
-
-  AddMaterial("G4_GUANINE", 2.2/*1.58*/, 0, 75. ,4);
-  AddElementByAtomCount("C" ,  5);
-  AddElementByAtomCount("H" ,  5);
-  AddElementByAtomCount("N" ,  5);
-  AddElementByAtomCount("O" ,  1);
 
 }
 
@@ -985,25 +938,10 @@ void DPMMaterialBuilder::NistCompoundMaterials2()
   AddElementByWeightFraction( 7, 0.035451);
   AddElementByWeightFraction( 8, 0.742522);
 
-  AddMaterial("G4_PHOTO_EMULSION", 3.815, 0, 331., 8);
-  AddElementByWeightFraction( 1, 0.0141  );
-  AddElementByWeightFraction( 6, 0.072261);
-  AddElementByWeightFraction( 7, 0.01932 );
-  AddElementByWeightFraction( 8, 0.066101);
-  AddElementByWeightFraction(16, 0.00189 );
-  AddElementByWeightFraction(35, 0.349103);
-  AddElementByWeightFraction(47, 0.474105);
-  AddElementByWeightFraction(53, 0.00312 );
-
   AddMaterial("G4_POLYETHYLENE", 0.94, 0, 57.4, 2);
   AddElementByAtomCount("C" ,  1);
   AddElementByAtomCount("H" ,  2);
   chFormulas[nMaterials-1] = "(C_2H_4)_N-Polyethylene";
-
-  AddMaterial("G4_PYRIDINE", 0.9819, 0, 66.2, 3);
-  AddElementByAtomCount("C" ,  5);
-  AddElementByAtomCount("H" ,  5);
-  AddElementByAtomCount("N" ,  1);
 
   AddMaterial("G4_SKIN_ICRP", 1.09, 0, 72.7, 9);
   AddElementByWeightFraction( 1, 0.100);
@@ -1015,10 +953,6 @@ void DPMMaterialBuilder::NistCompoundMaterials2()
   AddElementByWeightFraction(16, 0.002);
   AddElementByWeightFraction(17, 0.003);
   AddElementByWeightFraction(19, 0.001);
-
-  AddMaterial("G4_STILBENE", 0.9707, 0, 67.7, 2);
-  AddElementByAtomCount("C" , 14);
-  AddElementByAtomCount("H" , 12);
 
   AddMaterial("G4_TESTIS_ICRP", 1.04, 0, 75., 9);
   AddElementByWeightFraction( 1, 0.106);
@@ -1068,17 +1002,209 @@ void DPMMaterialBuilder::NistCompoundMaterials2()
   AddElementByAtomCount("N" ,  2);
   AddElementByAtomCount("O" ,  1);
 
-  AddMaterial("G4_VALINE", 1.23, 0, 67.7, 4);
-  AddElementByAtomCount("C" ,  5);
-  AddElementByAtomCount("H" , 11);
-  AddElementByAtomCount("N" ,  1);
-  AddElementByAtomCount("O" ,  2);
-
   AddMaterial("G4_WATER_VAPOR", 0.000756182, 0, 71.6, 2, kStateGas);
   AddElementByAtomCount("H" ,  2);
   AddElementByAtomCount("O" ,  1);
   chFormulas[nMaterials-1] = "H_2O-Gas";
 
-  nNIST = nMaterials;
+  // nNIST = nMaterials;
 }
 
+void DPMMaterialBuilder::NistCompoundMaterials3()
+{
+   // Soft tissue (ICRP - NIST)
+    AddMaterial("SoftTissue", 1.00, 0, 69.02, 13);    
+    AddElementByWeightFraction(1, 10.4472*perCent);
+    AddElementByWeightFraction(6, 23.219*perCent);
+    AddElementByWeightFraction(7, 2.488*perCent);
+    AddElementByWeightFraction(8, 63.0238*perCent);
+    AddElementByWeightFraction(11, 0.113*perCent);
+    AddElementByWeightFraction(12, 0.0113*perCent);
+    AddElementByWeightFraction(15, 0.113*perCent);
+    AddElementByWeightFraction(16, 0.199*perCent);
+    AddElementByWeightFraction(17, 0.134*perCent);
+    AddElementByWeightFraction(19, 0.199*perCent);
+    AddElementByWeightFraction(20, 0.023*perCent);
+    AddElementByWeightFraction(26, 0.005*perCent);
+    AddElementByWeightFraction(30, 0.003*perCent);
+
+    //  Lung Inhale
+    AddMaterial("LungInhale", 0.217, 0, 69.44, 9);    
+    AddElementByWeightFraction(1,0.103);
+    AddElementByWeightFraction(6,0.105);
+    AddElementByWeightFraction(7,0.031);
+    AddElementByWeightFraction(8,0.749);
+    AddElementByWeightFraction(11,0.002);
+    AddElementByWeightFraction(15,0.002);
+    AddElementByWeightFraction(16,0.003);
+    AddElementByWeightFraction(17,0.002);
+    AddElementByWeightFraction(19,0.003);
+
+    // Lung exhale
+    AddMaterial("LungExhale", 0.508, 0, 69.44, 9);    
+    AddElementByWeightFraction(1,0.103);
+    AddElementByWeightFraction(6,0.105);
+    AddElementByWeightFraction(7,0.031);
+    AddElementByWeightFraction(8,0.749);
+    AddElementByWeightFraction(11,0.002);
+    AddElementByWeightFraction(15,0.002);
+    AddElementByWeightFraction(16,0.003);
+    AddElementByWeightFraction(17,0.002);
+    AddElementByWeightFraction(19,0.003);
+
+    // Adipose tissue
+    AddMaterial("AdiposeTissue", 0.967, 0, 62.23, 7);    
+    AddElementByWeightFraction(1,0.114);
+    AddElementByWeightFraction(6,0.598);
+    AddElementByWeightFraction(7,0.007);
+    AddElementByWeightFraction(8,0.278);
+    AddElementByWeightFraction(11,0.001);
+    AddElementByWeightFraction(16,0.001);
+    AddElementByWeightFraction(17,0.001);
+
+    // Brain (ICRP - NIST)
+    AddMaterial("BrainTissue", 1.03, 0, 73.3, 13);    
+    AddElementByWeightFraction(1, 11.0667*perCent);
+    AddElementByWeightFraction(6, 12.542*perCent);
+    AddElementByWeightFraction(7, 1.328*perCent);
+    AddElementByWeightFraction(8, 73.7723*perCent);
+    AddElementByWeightFraction(11, 0.1840*perCent);
+    AddElementByWeightFraction(12, 0.015*perCent);
+    AddElementByWeightFraction(15, 0.356*perCent);
+    AddElementByWeightFraction(16, 0.177*perCent);
+    AddElementByWeightFraction(17, 0.236*perCent);
+    AddElementByWeightFraction(19, 0.31*perCent);
+    AddElementByWeightFraction(20, 0.009*perCent);
+    AddElementByWeightFraction(26, 0.005*perCent);
+    AddElementByWeightFraction(30, 0.001*perCent); 
+
+   // Breast
+    AddMaterial("Breast", 0.990, 0, 70.3, 8);    
+    AddElementByWeightFraction(1,0.109);
+    AddElementByWeightFraction(6,0.506);
+    AddElementByWeightFraction(7,0.023);
+    AddElementByWeightFraction(8,0.358);
+    AddElementByWeightFraction(11,0.001);
+    AddElementByWeightFraction(15,0.001);
+    AddElementByWeightFraction(16,0.001);
+    AddElementByWeightFraction(17,0.001);
+
+    // Spinal Disc
+    AddMaterial("SpinalDisc", 1.10, 0, 74.75, 8);    
+    AddElementByWeightFraction(1, 9.60*perCent);
+    AddElementByWeightFraction(6, 9.90*perCent);
+    AddElementByWeightFraction(7, 2.20*perCent);
+    AddElementByWeightFraction(8, 74.40*perCent);
+    AddElementByWeightFraction(11, 0.50*perCent);
+    AddElementByWeightFraction(15, 2.20*perCent);
+    AddElementByWeightFraction(16, 0.90*perCent);
+    AddElementByWeightFraction(17, 0.30*perCent);
+
+    // Muscle
+    AddMaterial("Muscle", 1.061, 0, 75.3, 9);    
+    AddElementByWeightFraction(1,0.102);
+    AddElementByWeightFraction(6,0.143);
+    AddElementByWeightFraction(7,0.034);
+    AddElementByWeightFraction(8,0.710);
+    AddElementByWeightFraction(11,0.001);
+    AddElementByWeightFraction(15,0.002);
+    AddElementByWeightFraction(16,0.003);
+    AddElementByWeightFraction(17,0.001);
+    AddElementByWeightFraction(19,0.004);
+
+    // Liver
+    AddMaterial("Liver", 1.071, 0, 69.02, 9);    
+    AddElementByWeightFraction(1,0.102);
+    AddElementByWeightFraction(6,0.139);
+    AddElementByWeightFraction(7,0.030);
+    AddElementByWeightFraction(8,0.716);
+    AddElementByWeightFraction(11,0.002);
+    AddElementByWeightFraction(15,0.003);
+    AddElementByWeightFraction(16,0.003);
+    AddElementByWeightFraction(17,0.002);
+    AddElementByWeightFraction(19,0.003);
+
+    // Tooth Dentin
+    AddMaterial("ToothDentin", 2.14, 0, 80, 10);    
+    AddElementByWeightFraction(1, 2.67*perCent);
+    AddElementByWeightFraction(6, 12.77*perCent);
+    AddElementByWeightFraction(7, 4.27*perCent);
+    AddElementByWeightFraction(8, 40.40*perCent);
+    AddElementByWeightFraction(11, 0.65*perCent);
+    AddElementByWeightFraction(12, 0.59*perCent);
+    AddElementByWeightFraction(15, 11.86*perCent);
+    AddElementByWeightFraction(17, 0.04*perCent);
+    AddElementByWeightFraction(20, 26.74*perCent);
+    AddElementByWeightFraction(30, 0.01*perCent);
+
+    // Trabecular Bone
+    AddMaterial("TrabecularBone", 1.159, 0, 63.97, 12);    
+    AddElementByWeightFraction(1,0.085);
+    AddElementByWeightFraction(6,0.404);
+    AddElementByWeightFraction(7,0.058);
+    AddElementByWeightFraction(8,0.367);
+    AddElementByWeightFraction(11,0.001);
+    AddElementByWeightFraction(12,0.001);
+    AddElementByWeightFraction(15,0.034);
+    AddElementByWeightFraction(16,0.002);
+    AddElementByWeightFraction(17,0.002);
+    AddElementByWeightFraction(19,0.001);
+    AddElementByWeightFraction(20,0.044);
+    AddElementByWeightFraction(26,0.001);
+
+    // Trabecular bone used in the DICOM Head   
+    AddMaterial("TrabecularBone_HEAD", 1.18, 0, 63.97, 12);    
+    AddElementByWeightFraction(1, 8.50*perCent);
+    AddElementByWeightFraction(6, 40.40*perCent);
+    AddElementByWeightFraction(7, 2.80*perCent);
+    AddElementByWeightFraction(8, 36.70*perCent);
+    AddElementByWeightFraction(11, 0.10*perCent);
+    AddElementByWeightFraction(12, 0.10*perCent);
+    AddElementByWeightFraction(15, 3.40*perCent);
+    AddElementByWeightFraction(16, 0.20*perCent);
+    AddElementByWeightFraction(17, 0.20*perCent);
+    AddElementByWeightFraction(19, 0.10*perCent);
+    AddElementByWeightFraction(20, 7.40*perCent);
+    AddElementByWeightFraction(26, 0.10*perCent);
+
+    // Dense Bone
+    AddMaterial("DenseBone", 1.575, 0, 91.9, 11);    
+    AddElementByWeightFraction(1,0.056);
+    AddElementByWeightFraction(6,0.235);
+    AddElementByWeightFraction(7,0.050);
+    AddElementByWeightFraction(8,0.434);
+    AddElementByWeightFraction(11,0.001);
+    AddElementByWeightFraction(12,0.001);
+    AddElementByWeightFraction(15,0.072);
+    AddElementByWeightFraction(16,0.003);
+    AddElementByWeightFraction(17,0.001);
+    AddElementByWeightFraction(19,0.001);
+    AddElementByWeightFraction(20,0.146);
+
+    // Cortical Bone (ICRP - NIST)
+    AddMaterial("CorticalBone", 1.85, 0, 106.4, 9);    
+    AddElementByWeightFraction(1, 4.7234*perCent);
+    AddElementByWeightFraction(6, 14.4330*perCent);
+    AddElementByWeightFraction(7, 4.199*perCent);
+    AddElementByWeightFraction(8, 44.6096*perCent);
+    AddElementByWeightFraction(12, 0.22*perCent);
+    AddElementByWeightFraction(15, 10.497*perCent);
+    AddElementByWeightFraction(16, 0.315*perCent);
+    AddElementByWeightFraction(20, 20.993*perCent);
+    AddElementByWeightFraction(30, 0.01*perCent);
+
+    // Tooth enamel 
+    AddMaterial("ToothEnamel", 2.89, 0, 80, 10);    
+    AddElementByWeightFraction(1, 0.95*perCent);
+    AddElementByWeightFraction(6, 1.11*perCent);
+    AddElementByWeightFraction(7, 0.23*perCent);
+    AddElementByWeightFraction(8,41.66*perCent);
+    AddElementByWeightFraction(11, 0.79*perCent);
+    AddElementByWeightFraction(12, 0.23*perCent);
+    AddElementByWeightFraction(15, 18.71*perCent);
+    AddElementByWeightFraction(17, 0.34*perCent);
+    AddElementByWeightFraction(20, 35.97*perCent);
+    AddElementByWeightFraction(30, 0.02*perCent);
+
+    nNIST = nMaterials;
+}

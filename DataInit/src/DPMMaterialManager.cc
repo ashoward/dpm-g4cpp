@@ -109,7 +109,6 @@ DPMMaterialManager::~DPMMaterialManager()
   //  G4cout << "NistManager: end isotope destruction" << G4endl;
   delete matBuilder;
   delete elmBuilder;
-  delete fICRU90;
   // G4cout << "NistManager: end destruction" << G4endl;
 }
 
@@ -226,53 +225,6 @@ DPMMaterialManager::DPMMaterialManager()
   }
   POWERA27[0] = 1.0;
   LOGAZ[0]    = 0.0;
-  fICRU90 = nullptr;
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-G4ICRU90StoppingData* DPMMaterialManager::GetICRU90StoppingData()
-{
-  if (!fICRU90) {
-#ifdef G4MULTITHREADED
-    G4MUTEXLOCK(&nistManagerMutex);
-    if (!fICRU90) {
-#endif
-      fICRU90 = new G4ICRU90StoppingData();
-#ifdef G4MULTITHREADED
-    }
-    G4MUTEXUNLOCK(&nistManagerMutex);
-#endif
-  }
-  return fICRU90;
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-void DPMMaterialManager::SetDensityEffectCalculatorFlag(const G4String& mname,
-                                                   G4bool val)
-{
-#ifdef G4MULTITHREADED
-  G4MUTEXLOCK(&nistManagerMutex);
-#endif
-  if(mname == "all") {
-    for(auto mat : materials) {
-      SetDensityEffectCalculatorFlag(mat, val);
-    }
-  } else {
-    G4Material* mat = FindMaterial(mname);
-    SetDensityEffectCalculatorFlag(mat, val);
-  }
-#ifdef G4MULTITHREADED
-  G4MUTEXUNLOCK(&nistManagerMutex);
-#endif
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-void DPMMaterialManager::SetDensityEffectCalculatorFlag(G4Material* mat, G4bool val)
-{
-  if(mat) { mat->ComputeDensityEffectOnFly(val); }
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
